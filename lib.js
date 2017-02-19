@@ -1,58 +1,77 @@
-var soc = io(':8080');
-let surcouche = function(socket)
-{
-	let ids = [];
+class Socket{
+	constructor (socket) {
+		this.ids = [];
+		this.ons = [];
 
-	let makeID = function(length)
-	{
-		let text = "";
-		let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		const callEvent = (req)=> {
+			if(req.event in this.ons)
+			{
+				this.ons[req.event](req.data, (retour)=>{
+					socket.emit("callbackReturn", {id: req.id, value: retour});
+				}, (err)=>{
+					socket.emit("callbackError", {id: req.id, value: err});
+				});
+			}else{
+				let err = "no event";
+				socket.emit("callbackError", {id: req.id, value: err});
+			}
+		};
 
-		for(let i=0; i < length; i++)
-			text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-		return text;
-	};
-
-	let newID = function(length)
-	{
-		let id = makeID(length);
-		if(id in ids)
-		{
-			id = newID(length);
-		}
-		return id;
-	};
-
-	this.get = function(event, data){
-		return new Promise(function(resolve, reject){
-			let id = newID(32);
-
-			ids[id] = function(result, retour){
-				if(result)
-				{
-					resolve(retour);
-				}else{
-					reject(retour);
-				}
-			};
-
-			socket.emit('callback', {id: id, event: event, data: data})
+		socket.on('callbackReturn', (retour)=>{
+			this.ids[retour.id](true, retour.value);
+			delete this.ids[retour.id];
 		});
+
+		socket.on('callbackError', (retour)=>{
+			this.ids[retour.id](false, retour.value);
+			delete this.ids[retour.id];
+		});
+
+		socket.on("callback", (req)=>{
+			callEvent(req);
+		});
+
+		this.emit = socket.emit;
+		this.socket = socket;
+
+		return this;
+	}
+
+	get (event, data, cb){
+		const newID = (length)=>{
+			const makeID = (length)=>{
+				let text = "";
+				let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+				for(let i=0; i < length; i++)
+				text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+				return text;
+			}
+
+			let id = makeID(length);
+			if(id in this.ids)
+			{
+				id = newID(length);
+			}
+			return id;
+		}
+
+		let id = newID(32);
+
+		this.ids[id] = cb;
+
+		this.socket.emit('callback', {id: id, event: event, data: data})
+
+		return this;
 	};
 
-	socket.on('callbackReturn', function(retour){
-		ids[retour.id](true, retour.value);
-		delete ids[retour.id];
-	});
-	socket.on('callbackError', function(retour){
-		ids[retour.id](false, retour.value);
-		delete ids[retour.id];
-	});
+	on(event, cb){
+		this.ons[event] = cb;
 
-	this.emit = socket.emit;
-	this.socket = socket;
+		return this;
+	}
 
-	return this;
-};
-let socket = surcouche(soc);
+}
+
+module.exports = Socket;

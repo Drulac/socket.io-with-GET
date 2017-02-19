@@ -1,0 +1,15 @@
+{
+  "name": "socket.io-with-get",
+  "version": "1.0.0",
+  "description": "socket.io surcouche who allow you to perform get request trought websockets",
+  "main": "lib.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Drulac/socket.io-with-GET/"
+  },
+  "author": "drulac",
+  "license": "GPL-3.0"
+}
