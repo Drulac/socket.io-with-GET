@@ -11,5 +11,8 @@
     "url": "https://github.com/Drulac/socket.io-with-GET/"
   },
   "author": "drulac",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "dependencies": {
+    "socket.io": "^1.7.3"
+  }
 }
