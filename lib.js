@@ -3,7 +3,7 @@ class Socket{
 		this.ids = [];
 		this.ons = [];
 
-		const callEvent = (req)=> {
+		let callEvent = (req)=> {
 			if(req.event in this.ons)
 			{
 				this.ons[req.event](req.data, (retour)=>{
@@ -23,8 +23,12 @@ class Socket{
 		});
 
 		socket.on('callbackError', (retour)=>{
-			this.ids[retour.id](false, retour.value);
-			delete this.ids[retour.id];
+			try{
+				this.ids[retour.id](false, retour.value);
+			}catch(e){}
+			try{
+				delete this.ids[retour.id];
+			}catch(e){}
 		});
 
 		socket.on("callback", (req)=>{
@@ -73,5 +77,6 @@ class Socket{
 	}
 
 }
-
-module.exports = Socket;
+try{
+	module.exports = Socket;
+}catch(e){}
