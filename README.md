@@ -1,5 +1,6 @@
 # socket.io-with-GET
 socket.io surcouche who allow you to perform get request trought websockets
+(the code source work both in the browser and in NodeJS)
 
 use is really easy :
 
