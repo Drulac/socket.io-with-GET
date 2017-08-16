@@ -18,13 +18,17 @@ class Socket{
 		};
 
 		socket.on('callbackReturn', (retour)=>{
-			this.ids[retour.id](true, retour.value);
-			delete this.ids[retour.id];
+			try{
+				this.ids[retour.id](retour.value);
+			}catch(e){}
+			try{
+				delete this.ids[retour.id];
+			}catch(e){}
 		});
 
 		socket.on('callbackError', (retour)=>{
 			try{
-				this.ids[retour.id](false, retour.value);
+				this.ids[retour.id](retour.value);
 			}catch(e){}
 			try{
 				delete this.ids[retour.id];
@@ -41,33 +45,35 @@ class Socket{
 		return this;
 	}
 
-	get (event, data, cb){
-		const newID = (length)=>{
-			const makeID = (length)=>{
-				let text = "";
-				let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	get (event, data){
+		return new Promise(async (resolve, reject)=>{
+			const newID = (length)=>{
+				const makeID = (length)=>{
+					let text = "";
+					let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-				for(let i=0; i < length; i++)
-				text += possible.charAt(Math.floor(Math.random() * possible.length));
+					for(let i=0; i < length; i++)
+					text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-				return text;
+					return text;
+				}
+
+				let id = makeID(length);
+				if(id in this.ids)
+				{
+					id = newID(length);
+				}
+				return id;
 			}
 
-			let id = makeID(length);
-			if(id in this.ids)
-			{
-				id = newID(length);
-			}
-			return id;
-		}
+			let id = newID(32);
 
-		let id = newID(32);
+			this.ids[id] = resolve;
 
-		this.ids[id] = cb;
+			this.socket.emit('callback', {id: id, event: event, data: data})
 
-		this.socket.emit('callback', {id: id, event: event, data: data})
-
-		return this;
+			return this;
+		});
 	};
 
 	on(event, cb){
