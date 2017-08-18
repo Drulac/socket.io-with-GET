@@ -3,40 +3,28 @@ class Socket{
 		this.ids = [];
 		this.ons = [];
 
-		let callEvent = (req)=> {
-			if(req.event in this.ons)
+		const callEvent = retour=>{
+			if(retour.id in this.ids)
 			{
-				this.ons[req.event](req.data, (retour)=>{
-					socket.emit("callbackReturn", {id: req.id, value: retour});
-				}, (err)=>{
-					socket.emit("callbackError", {id: req.id, value: err});
-				});
-			}else{
-				let err = "no event";
-				socket.emit("callbackError", {id: req.id, value: err});
+				this.ids[retour.id](retour.value);
+				delete this.ids[retour.id]
 			}
 		};
 
-		socket.on('callbackReturn', (retour)=>{
-			try{
-				this.ids[retour.id](retour.value);
-			}catch(e){}
-			try{
-				delete this.ids[retour.id];
-			}catch(e){}
-		});
+		socket.on('callbackReturn', callEvent);
+		socket.on('callbackError', callEvent);
 
-		socket.on('callbackError', (retour)=>{
-			try{
-				this.ids[retour.id](retour.value);
-			}catch(e){}
-			try{
-				delete this.ids[retour.id];
-			}catch(e){}
-		});
-
-		socket.on("callback", (req)=>{
-			callEvent(req);
+		socket.on("callback", req=> {
+			if(req.event in this.ons)
+			{
+				this.ons[req.event](req.data, retour=>
+					socket.emit("callbackReturn", {id: req.id, value: retour});
+				, err=>
+					socket.emit("callbackError", {id: req.id, value: err});
+				);
+			}else{
+				socket.emit("callbackError", {id: req.id, value: "no event"});
+			}
 		});
 
 		this.emit = socket.emit;
@@ -47,18 +35,14 @@ class Socket{
 
 	get (event, data){
 		return new Promise(async (resolve, reject)=>{
-			const newID = (length)=>{
-				const makeID = (length)=>{
-					let text = "";
-					let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+			const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-					for(let i=0; i < length; i++)
-					text += possible.charAt(Math.floor(Math.random() * possible.length));
+			const newID = length=>{
+				let id = "";
 
-					return text;
-				}
+				for(let i=0; i < length; i++)
+				id += possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
 
-				let id = makeID(length);
 				if(id in this.ids)
 				{
 					id = newID(length);
@@ -71,8 +55,6 @@ class Socket{
 			this.ids[id] = resolve;
 
 			this.socket.emit('callback', {id: id, event: event, data: data})
-
-			return this;
 		});
 	};
 
