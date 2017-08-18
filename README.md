@@ -1,5 +1,5 @@
 # socket.io-with-GET
-socket.io superset who allow you to perform get request trought websockets
+socket.io superset who allow you to perform get request through websockets
 (the code source work both in the browser and in NodeJS)
 
 use is really easy :
