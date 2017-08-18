@@ -7,16 +7,16 @@ use is really easy :
 you can use it in the client :
 ```js
 (async ()=>{
-var soc = io(':8080');
-let socket = new Socket(soc);
+	var soc = io(':8080');
+	let socket = new Socket(soc);
 
-socket.on('name', (data, cb)=>{
-	cb("My name is Jhon... Jhon Doe...");
-});
+	socket.on('name', (data, cb)=>{
+		cb("My name is Jhon... Jhon Doe...");
+	});
 
-let data = await socket.get("ping", {start: new Date().getTime()}).catch(err=>throw new Error(err));
-let pingTime = new Date().getTime() - data.start;
-console.log(pingTime+" ms");
+	let data = await socket.get("ping", {start: new Date().getTime()}).catch(err=>throw new Error(err));
+	let pingTime = new Date().getTime() - data.start;
+	console.log(pingTime+" ms");
 })().catch(err=>throw new Error(err));
 ```
 (you must include the socket.io source code before include our code)
