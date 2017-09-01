@@ -1,17 +1,16 @@
 {
-	"name": "socket.io-with-get",
-	"version": "1.1.7",
-	"description": "socket.io superset who allow you to perform get request through websockets",
-	"main": "socket.io-with-get.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/Drulac/socket.io-with-GET/"
-	},
-	"author": "drulac",
-	"license": "GPL-3.0",
-	"dependencies": {
-	}
+  "name": "socket.io-with-get",
+  "version": "1.1.8",
+  "description": "socket.io superset who allow you to perform get request through websockets",
+  "main": "socket.io-with-get.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Drulac/socket.io-with-GET/"
+  },
+  "author": "drulac",
+  "license": "GPL-3.0",
+  "dependencies": {}
 }
