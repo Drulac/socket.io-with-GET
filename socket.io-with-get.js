@@ -17,11 +17,11 @@ class Socket{
 		socket.on("callback", req=> {
 			if(req.event in this.ons)
 			{
-				this.ons[req.event](req.data, retour=>
+				this.ons[req.event](req.data, retour=>{
 					socket.emit("callbackReturn", {id: req.id, value: retour});
-				, err=>
+				}, err=>{
 					socket.emit("callbackError", {id: req.id, value: err});
-				);
+				});
 			}else{
 				socket.emit("callbackError", {id: req.id, value: "no event"});
 			}

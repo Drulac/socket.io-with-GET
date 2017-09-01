@@ -17,7 +17,7 @@ you can use it in the client :
 	let data = await socket.get("ping", {start: new Date().getTime()}).catch(err=>throw new Error(err));
 	let pingTime = new Date().getTime() - data.start;
 	console.log(pingTime+" ms");
-})().catch(err=>throw new Error(err));
+})().catch(err=>{throw new Error(err)});
 ```
 (you must include the socket.io source code before include our code)
 
@@ -38,3 +38,4 @@ io.on('connection', async function(socket){
 	console.log(data);
 });
 ```
+
