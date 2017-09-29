@@ -1,7 +1,11 @@
-class Socket{
+const EventEmitter = require('events');
+
+class Socket extends EventEmitter{
 	constructor (socket) {
+		super();
 		this.ids = [];
-		this.ons = [];
+
+		this.write = socket.write || socket.emit;
 
 		const callEvent = retour=>{
 			if(retour.id in this.ids)
@@ -15,22 +19,14 @@ class Socket{
 		socket.on('callbackError', callEvent);
 
 		socket.on("callback", req=> {
-			if(req.event in this.ons)
-			{
-				this.ons[req.event](req.data, retour=>{
-					socket.emit("callbackReturn", {id: req.id, value: retour});
-				}, err=>{
-					socket.emit("callbackError", {id: req.id, value: err});
-				});
-			}else{
-				socket.emit("callbackError", {id: req.id, value: "no event"});
-			}
+			this.emit(req.event, req.data, retour=>{
+				this.write("callbackReturn", {id: req.id, value: retour});
+			}, err=>{
+				this.write("callbackError", {id: req.id, value: err});
+			});
 		});
 
-		this.emit = socket.emit;
 		this.socket = socket;
-
-		return this;
 	}
 
 	get (event, data){
@@ -54,16 +50,9 @@ class Socket{
 
 			this.ids[id] = resolve;
 
-			this.socket.emit('callback', {id: id, event: event, data: data})
+			this.write('callback', {id: id, event: event, data: data})
 		});
 	};
-
-	on(event, cb){
-		this.ons[event] = cb;
-
-		return this;
-	}
-
 }
 try{
 	module.exports = Socket;
