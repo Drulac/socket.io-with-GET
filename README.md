@@ -1,6 +1,6 @@
 # socket.io-with-GET
 socket.io superset who allow you to perform get request through websockets
-(the code source work both in the browser and in NodeJS)
+(for the browser you will find the code in [socket-with-get.js](./socket-with-get.js))
 
 use is really easy :
 
@@ -19,8 +19,7 @@ you can use it in the client :
 	console.log(pingTime+" ms");
 })().catch(err=>{throw new Error(err)});
 ```
-(you must include the socket.io source code before include our code)
-
+(you must include the socket.io source code before include our code) (or use native websocket with [socket-with-on](https://github.com/Drulac/uws-with-on))
 
 and this on the server :
 ```js
@@ -38,4 +37,3 @@ io.on('connection', async function(socket){
 	console.log(data);
 });
 ```
-

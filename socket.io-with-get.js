@@ -5,24 +5,24 @@ class Socket extends EventEmitter{
 		super();
 		this.ids = [];
 
-		this.write = socket.write || socket.emit;
+		this.write = socket.write || socket.emit;
 
-		const callEvent = retour=>{
-			if(retour.id in this.ids)
+		const callEvent = ([id, value])=>{
+			if(id in this.ids)
 			{
-				this.ids[retour.id](retour.value);
-				delete this.ids[retour.id]
+				this.ids[id](value);
+				delete this.ids[id]
 			}
 		};
 
-		socket.on('callbackReturn', callEvent);
-		socket.on('callbackError', callEvent);
+		socket.on(1, callEvent);
+		socket.on(2, callEvent);
 
-		socket.on("callback", req=> {
-			this.emit(req.event, req.data, retour=>{
-				this.write("callbackReturn", {id: req.id, value: retour});
+		socket.on(0, ([id, event, args])=> {
+			this.emit(event, args, data=>{
+				this.write(1, [id, data]);
 			}, err=>{
-				this.write("callbackError", {id: req.id, value: err});
+				this.write(2, [id, err]);
 			});
 		});
 
@@ -31,26 +31,21 @@ class Socket extends EventEmitter{
 
 	get (event, data){
 		return new Promise(async (resolve, reject)=>{
-			const possibleChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
 			const newID = length=>{
-				let id = "";
-
-				for(let i=0; i < length; i++)
-				id += possibleChars.charAt(Math.floor(Math.random() * possibleChars.length));
+				const id = Math.floor(Math.random() * parseInt('9'.repeat(length)))
 
 				if(id in this.ids)
 				{
-					id = newID(length);
+					return newID(length);
 				}
 				return id;
 			}
 
-			let id = newID(32);
+			const id = newID(3);
 
 			this.ids[id] = resolve;
 
-			this.write('callback', {id: id, event: event, data: data})
+			this.write(0, [id, event, data])
 		});
 	};
 }
