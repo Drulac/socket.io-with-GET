@@ -9,8 +9,8 @@ you can use it in the client :
 (async ()=>{
 	const socket = new Socket(io(':8080'));
 
-	socket.on('name', (data, cb)=>{
-		cb("My name is Jhon... Jhon Doe...");
+	socket.on('name', async (data)=>{
+		return "My name is Jhon... Jhon Doe...";
 	});
 
 	let data = await socket.get("ping", {start: new Date().getTime()}).catch(err=>{throw new Error(err)});
@@ -29,8 +29,8 @@ var Socket = require('socket.io-with-get');
 io.on('connection', async function(socket){
 	socket = new Socket(socket);
 
-	socket.on('ping', (data, cb)=>{
-		cb(data);
+	socket.on('ping', async (data)=>{
+		return data;
 	});
 
 	let data = await socket.get("name", {}).catch(err=>throw new Error(err));
